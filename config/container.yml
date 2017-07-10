@@ -1,0 +1,7 @@
+services:
+  serializer:
+    class: '\JMS\Serializer\SerializerInterface'
+    factory: ['\Alberteddu\Octopus\Service\SerializerBuilder', createOctopusSerializer]
+
+  parser:
+    class: '\Alberteddu\Octopus\Service\Parser'
