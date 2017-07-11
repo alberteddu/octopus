@@ -2,7 +2,7 @@
 <?php
 
 use Alberteddu\Octopus\Octopus;
-use Alberteddu\Octopus\OctopusApplicagtion;
+use Alberteddu\Octopus\OctopusApplication;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -12,5 +12,5 @@ AnnotationRegistry::registerAutoloadNamespace(
     __DIR__ . '/../vendor/jms/serializer/src'
 );
 
-$application = new OctopusApplicagtion('Octopus', '@package_version@');
+$application = new OctopusApplication('Octopus', '@package_version@');
 $application->run();

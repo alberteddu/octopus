@@ -17,6 +17,7 @@
         "symfony/dependency-injection": "^3.3",
         "symfony/config": "^3.3",
         "jms/serializer": "^1.7",
-        "justinrainbow/json-schema": "^5.2"
+        "justinrainbow/json-schema": "^5.2",
+        "deployer/phar-update": "^2.0"
     }
 }
