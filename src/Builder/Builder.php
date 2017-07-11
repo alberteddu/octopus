@@ -70,7 +70,8 @@ class Builder
         Render $render,
         InputInterface $input,
         OutputInterface $output
-    ) {
+    )
+    {
         $this->parser = $parser;
         $this->validator = $validator;
         $this->render = $render;
@@ -130,6 +131,7 @@ class Builder
         $path = $this->parsePath($output->getPath(), $contextBlueprint);
         $dirname = dirname($path);
         $overwrite = $this->overwrite;
+        $willOverwrite = $this->overwrite;
 
         if (is_file($path) && !$this->overwrite) {
             /** @var QuestionHelper $question */
@@ -145,15 +147,42 @@ class Builder
 
                 return;
             }
+
+            $willOverwrite = true;
         }
 
         if (!is_dir($dirname)) {
             mkdir($dirname, 0777, true);
         }
 
-        file_put_contents($path, $this->render->render($output, $this->environment, $contextBlueprint));
+        $template = $this->render->render($output, $this->environment, $contextBlueprint);
 
-        if ($overwrite) {
+        if ($willOverwrite) {
+            // Check if the file contains any dynamic section
+            // that must be preserved.
+            $currentMatches = [];
+            $currentContents = file_get_contents($path);
+            $pattern = '!\[octopus\:(\w+)\](.*)\[\/octopus\:\1\]!s';
+            preg_match_all($pattern, $currentContents, $matches);
+            $i = 0;
+            foreach ($matches[1] as $name) {
+                $currentMatches[$name] = $matches[2][$i];
+                $i++;
+            }
+            $template = preg_replace_callback($pattern, function (array $matches) use ($currentMatches) {
+                if (isset($currentMatches[$matches[1]])) {
+                    $dynamic = $currentMatches[$matches[1]];
+                } else {
+                    $dynamic = '';
+                }
+
+                return sprintf('[octopus:%s]%s[/octopus:%s]', $matches[1], $dynamic, $matches[1]);
+            }, $template);
+        }
+
+        file_put_contents($path, $template);
+
+        if ($willOverwrite) {
             $this->output->writeln(sprintf('Overwrote file <comment>"%s"</comment>', realpath($path)));
         } else {
             $this->output->writeln(sprintf('Wrote file <info>"%s"</info>', realpath($path)));
