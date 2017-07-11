@@ -11,6 +11,11 @@ use Alberteddu\Octopus\DTO\Output;
 use Alberteddu\Octopus\Parser\Parser;
 use Alberteddu\Octopus\Render\Render;
 use Alberteddu\Octopus\Validator\Validator;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class Builder
 {
@@ -39,11 +44,39 @@ class Builder
      */
     private $render;
 
-    public function __construct(Parser $parser, Validator $validator, Render $render)
-    {
+    /**
+     * @var InputInterface
+     */
+    private $input;
+
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
+     * @var bool
+     */
+    private $overwrite = false;
+
+    /**
+     * @var HelperSet
+     */
+    private $helperSet;
+
+    public function __construct(
+        Parser $parser,
+        Validator $validator,
+        Render $render,
+        InputInterface $input,
+        OutputInterface $output
+    ) {
         $this->parser = $parser;
         $this->validator = $validator;
         $this->render = $render;
+        $this->input = $input;
+        $this->output = $output;
+        $this->helperSet = new HelperSet([new QuestionHelper()]);
     }
 
     public function build(Environment $environment)
@@ -53,7 +86,7 @@ class Builder
 
         if (!$valid) {
             foreach ($errors as $error) {
-                echo $error . PHP_EOL;
+                $this->output->writeln($error);
             }
 
             return;
@@ -96,12 +129,39 @@ class Builder
     {
         $path = $this->parsePath($output->getPath(), $contextBlueprint);
         $dirname = dirname($path);
+        $overwrite = $this->overwrite;
+
+        if (is_file($path) && !$this->overwrite) {
+            /** @var QuestionHelper $question */
+            $question = $this->helperSet->get('question');
+            $overwrite = $question->ask($this->input, $this->output, new ChoiceQuestion(
+                sprintf('File <info>%s</info> already exists. Overwrite?', realpath($path)),
+                ['Skip', 'Overwrite', 'Overwrite all'],
+                0
+            ));
+
+            if ($overwrite === 'Skip') {
+                $this->output->writeln(sprintf('<comment>Skipped "%s"</comment>', realpath($path)));
+
+                return;
+            }
+        }
 
         if (!is_dir($dirname)) {
             mkdir($dirname, 0777, true);
         }
 
         file_put_contents($path, $this->render->render($output, $this->environment, $contextBlueprint));
+
+        if ($overwrite) {
+            $this->output->writeln(sprintf('Overwrote file <comment>"%s"</comment>', realpath($path)));
+        } else {
+            $this->output->writeln(sprintf('Wrote file <info>"%s"</info>', realpath($path)));
+        }
+
+        if ($overwrite === 'Overwrite all') {
+            $this->overwrite = true;
+        }
     }
 
     public function buildDirectory(Output $output, BlueprintInstance $contextBlueprint = null)
@@ -110,6 +170,9 @@ class Builder
 
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
+            $this->output->writeln(sprintf('Wrote directory <info>"%s"</info>', realpath($path)));
+        } else {
+            $this->output->writeln(sprintf('Directory exists: <comment>"%s"</comment>', realpath($path)));
         }
     }
 

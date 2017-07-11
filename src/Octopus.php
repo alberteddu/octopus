@@ -10,6 +10,8 @@ use Alberteddu\Octopus\DTO\Environment;
 use Alberteddu\Octopus\Validator\Validator;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -23,10 +25,12 @@ class Octopus
      */
     private $container;
 
-    public function __construct()
+    public function __construct(InputInterface $input, OutputInterface $output)
     {
         $container = new ContainerBuilder();
         $container->setParameter('root_path', __DIR__ . '/..');
+        $container->set('input', $input);
+        $container->set('output', $output);
         $loader = new YamlFileLoader($container, new FileLocator(self::CONFIG));
         $loader->load('container.yml');
 
@@ -44,7 +48,7 @@ class Octopus
         /** @var Validator $validator */
         $validator = $this->container->get('validator');
 
-        $pwd = dirname($path);
+        $currentWorkingDirectory = dirname($path);
 
         $contents = file_get_contents($path);
         $valid = $validator->validateConfigurationString($contents, $errors);
@@ -59,7 +63,7 @@ class Octopus
 
         /** @var Configuration $configuration */
         $configuration = $serializer->deserialize($contents, Configuration::class, 'json');
-        $environment = new Environment($configuration, $pwd);
+        $environment = new Environment($configuration, $currentWorkingDirectory);
 
         $builder->build($environment);
     }

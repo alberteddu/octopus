@@ -7,6 +7,7 @@ namespace Alberteddu\Octopus\Validator;
 use Alberteddu\Octopus\DTO\BlueprintVariable;
 use Alberteddu\Octopus\DTO\Configuration;
 use JsonSchema\Validator as SchemaValidator;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Validator
 {
@@ -41,7 +42,7 @@ class Validator
         foreach ($configuration->getData() as $blueprintName => $capturesList) {
             // Check that data contains existing blueprints
             if (!$configuration->blueprintExists($blueprintName)) {
-                $currentErrors[] = sprintf('Blueprint %s does not exist.', $blueprintName);
+                $currentErrors[] = sprintf('<error>Blueprint %s does not exist.</error>', $blueprintName);
 
                 continue;
             }
@@ -56,7 +57,8 @@ class Validator
                 foreach ($blueprint->getVariables() as $variableName => $variable) {
                     // Check that every requied blueprint variable is defined
                     if ($variable->isRequired() && !isset($captures[$variableName])) {
-                        $currentErrors[] = sprintf('Variable %s is required but not provided.', $variableName);
+                        $currentErrors[] = sprintf('<error>Variable %s is required but not provided.</error>',
+                            $variableName);
 
                         continue;
                     }
@@ -66,7 +68,8 @@ class Validator
 
                         // Check that the variable type is correct
                         if (!$variable->checkType($actualVariable)) {
-                            $currentErrors[] = sprintf('Variable %s should be of type %s', $variableName, $variable->getType());
+                            $currentErrors[] = sprintf('<error>Variable %s should be of type %s</error>', $variableName,
+                                $variable->getType());
 
                             continue;
                         }
@@ -75,7 +78,7 @@ class Validator
 
                 foreach ($captures as $captureName => $captureValue) {
                     if (!$blueprint->variableExists($captureName)) {
-                        $currentErrors[] = sprintf('Variable %s is not allowed', $captureName);
+                        $currentErrors[] = sprintf('<error>Variable %s is not allowed</error>', $captureName);
                     }
                 }
             }

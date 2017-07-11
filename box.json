@@ -1,0 +1,21 @@
+{
+    "chmod": "0755",
+    "compression": "GZ",
+    "directories": [
+        "src"
+    ],
+    "files": [
+        "LICENSE",
+    ],
+    "finder": [
+        {
+            "name": "*.php",
+            "exclude": ["Tests"],
+            "in": "vendor"
+        }
+    ],
+    "git-version": "package_version",
+    "main": "bin/octopus",
+    "output": "octopus.phar",
+    "stub": true
+}
