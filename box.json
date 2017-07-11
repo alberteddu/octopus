@@ -2,10 +2,12 @@
     "chmod": "0755",
     "compression": "GZ",
     "directories": [
-        "src"
+        "src",
+        "lib",
+        "config"
     ],
     "files": [
-        "LICENSE",
+        "LICENSE"
     ],
     "finder": [
         {
