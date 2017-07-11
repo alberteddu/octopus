@@ -1,0 +1,14 @@
+<?php
+
+use Alberteddu\Octopus\Octopus;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+AnnotationRegistry::registerAutoloadNamespace(
+    'JMS\Serializer\Annotation',
+    __DIR__ . '/../vendor/jms/serializer/src'
+);
+
+$octopus = new Octopus();
+$octopus->buildFromFile(__DIR__ . '/../octopus.json');

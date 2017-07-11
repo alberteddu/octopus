@@ -118,6 +118,20 @@ class Configuration
         return $this->blueprints;
     }
 
+    public function blueprintExists(string $blueprintName): bool
+    {
+        return isset($this->blueprints[$blueprintName]);
+    }
+
+    public function getBlueprint(string $blueprintName): ?Blueprint
+    {
+        if (!$this->blueprintExists($blueprintName)) {
+            return null;
+        }
+
+        return $this->blueprints[$blueprintName];
+    }
+
     /**
      * @param Blueprint[] $blueprints
      *

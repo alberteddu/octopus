@@ -1,0 +1,86 @@
+{
+    "title": "Configuration",
+    "type": "object",
+    "properties": {
+        "target": {
+            "type": "string"
+        },
+        "variables": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "type": "string"
+                }
+            }
+        },
+        "blueprints": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "variables": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "required": true,
+                                            "enum": ["string", "boolean", "integer"]
+                                        },
+                                        "required": {
+                                            "type": "boolean"
+                                        },
+                                        "default": {
+                                            "type": ["string", "boolean", "integer"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "data": {
+            "type": "object",
+            "patternProperties": {
+                ".*": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "output": {
+            "type": "array",
+            "required": true,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["file", "directory"],
+                        "required": true
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "template": {
+                        "type": "string"
+                    },
+                    "blueprint": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}

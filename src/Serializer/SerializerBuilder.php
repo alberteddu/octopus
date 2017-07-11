@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Alberteddu\Octopus\Service;
+namespace Alberteddu\Octopus\Serializer;
 
 use JMS\Serializer\SerializerBuilder as BaseSerializerBuilder;
 use JMS\Serializer\SerializerInterface;

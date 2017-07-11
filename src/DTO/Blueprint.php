@@ -9,29 +9,43 @@ use JMS\Serializer\Annotation as Serializer;
 class Blueprint
 {
     /**
-     * @var string
+     * @var BlueprintVariable[]
      *
      * @Serializer\Type("array<string, Alberteddu\Octopus\DTO\BlueprintVariable>")
      */
     private $variables;
 
     /**
-     * @return string
+     * @return BlueprintVariable[]
      */
-    public function getVariables(): string
+    public function getVariables(): array
     {
         return $this->variables;
     }
 
+    public function variableExists(string $name): bool
+    {
+        return isset($this->variables[$name]);
+    }
+
     /**
-     * @param string $variables
+     * @param array $variables
      *
      * @return Blueprint
      */
-    public function setVariables(string $variables): Blueprint
+    public function setVariables(array $variables): Blueprint
     {
         $this->variables = $variables;
 
         return $this;
+    }
+
+    public function getVariable(string $name): ?BlueprintVariable
+    {
+        if (!$this->variableExists($name)) {
+            return null;
+        }
+
+        return $this->variables[$name];
     }
 }

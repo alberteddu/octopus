@@ -88,4 +88,21 @@ class BlueprintVariable
 
         return $this;
     }
+
+    public function checkType($value): bool
+    {
+        switch ($this->type) {
+            case 'string':
+                return is_string($value);
+                break;
+            case 'integer';
+                return is_integer($value);
+                break;
+            case 'boolean':
+                return is_bool($value);
+                break;
+            default:
+                return false;
+        }
+    }
 }

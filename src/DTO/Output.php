@@ -94,7 +94,7 @@ class Output
     /**
      * @return string
      */
-    public function getBlueprint(): string
+    public function getBlueprint(): ?string
     {
         return $this->blueprint;
     }
@@ -110,7 +110,7 @@ class Output
     /**
      * @return string
      */
-    public function getGroup(): string
+    public function getGroup(): ?string
     {
         return $this->group;
     }
@@ -121,5 +121,20 @@ class Output
     public function setGroup(string $group)
     {
         $this->group = $group;
+    }
+
+    public function isFile(): bool
+    {
+        return 'file' === $this->getType();
+    }
+
+    public function isDirectory(): bool
+    {
+        return 'directory' === $this->getType();
+    }
+
+    public function cycles(): bool
+    {
+        return null !== $this->getBlueprint();
     }
 }
