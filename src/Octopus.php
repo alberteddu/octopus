@@ -47,6 +47,8 @@ class Octopus
         $serializer = $this->container->get('serializer');
         /** @var Validator $validator */
         $validator = $this->container->get('validator');
+        /** @var OutputInterface $output */
+        $output = $this->container->get('output');
 
         $currentWorkingDirectory = dirname($path);
 
@@ -55,7 +57,7 @@ class Octopus
 
         if (!$valid) {
             foreach ($errors as $error) {
-                echo $error['message'] . PHP_EOL;
+                $output->writeln(sprintf('<error>%s: %s</error>', $error['property'], $error['message']));
             }
 
             return;
