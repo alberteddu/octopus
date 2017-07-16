@@ -22,5 +22,11 @@
         "sha1": "b4dac66019a3c55e6f64e99af0b26c5771501874",
         "url": "http://alberteddu.github.io/octopus/downloads/octopus-0.0.4.phar",
         "version": "0.0.4"
+    },
+    {
+        "name": "octopus.phar",
+        "sha1": "f98b98a111da84f46176e6244b1e6f79f252ec74",
+        "url": "http://alberteddu.github.io/octopus/downloads/octopus-0.0.5.phar",
+        "version": "0.0.5"
     }
 ]
