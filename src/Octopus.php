@@ -39,18 +39,14 @@ class Octopus
         $this->container = $container;
     }
 
-    public function buildFromFile(string $path)
+    public function getConfigurationFromFile(string $path): Configuration
     {
-        /** @var Builder $builder */
-        $builder = $this->container->get('builder');
         /** @var SerializerInterface $serializer */
         $serializer = $this->container->get('serializer');
         /** @var Validator $validator */
         $validator = $this->container->get('validator');
         /** @var OutputInterface $output */
         $output = $this->container->get('output');
-
-        $currentWorkingDirectory = dirname($path);
 
         $contents = file_get_contents($path);
         $valid = $validator->validateConfigurationString($contents, $errors);
@@ -60,11 +56,22 @@ class Octopus
                 $output->writeln(sprintf('<error>%s: %s</error>', $error['property'], $error['message']));
             }
 
-            return;
+            return null;
         }
 
         /** @var Configuration $configuration */
         $configuration = $serializer->deserialize($contents, Configuration::class, 'json');
+
+        return $configuration;
+    }
+
+    public function buildFromFile(string $path)
+    {
+        /** @var Builder $builder */
+        $builder = $this->container->get('builder');
+
+        $currentWorkingDirectory = dirname($path);
+        $configuration = $this->getConfigurationFromFile($path);
         $environment = new Environment($configuration, $currentWorkingDirectory);
 
         $builder->build($environment);
