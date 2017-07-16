@@ -18,10 +18,16 @@ class Environment
      */
     private $path;
 
+    /**
+     * @var string
+     */
+    private $templatePath;
+
     public function __construct(Configuration $configuration, string $path)
     {
         $this->configuration = $configuration;
         $this->path = $path;
+        $this->templatePath = joinPaths($path, $configuration->getTemplates());
     }
 
     /**
@@ -42,6 +48,18 @@ class Environment
 
     public function getTemplatePath(): string
     {
-        return joinPaths($this->getPath(), $this->configuration->getTemplates());
+        return $this->templatePath;
     }
+
+    /**
+     * @param string $templatePath
+     *
+     * @return Environment
+     */
+    public function setTemplatePath(string $templatePath): Environment
+    {
+        $this->templatePath = $templatePath;
+
+        return $this;
+}
 }
