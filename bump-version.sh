@@ -21,8 +21,11 @@ box build
 #
 git checkout gh-pages
 
+rm -f downloads/octopus-latest.phar
 cp octopus.phar downloads/octopus-${TAG}.phar
+cp octopus.phar downloads/octopus-latest.phar
 git add downloads/octopus-${TAG}.phar
+git add downloads/octopus-latest.phar
 
 SHA1=$(openssl sha1 octopus.phar | sed 's/^.* //')
 
