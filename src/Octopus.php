@@ -69,4 +69,12 @@ class Octopus
 
         $builder->build($environment);
     }
+
+    public function build(Environment $environment)
+    {
+        /** @var Builder $builder */
+        $builder = $this->container->get('builder');
+
+        $builder->build($environment);
+    }
 }

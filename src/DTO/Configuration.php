@@ -27,21 +27,21 @@ class Configuration
      *
      * @Serializer\Type("array<string, string>")
      */
-    private $variables;
+    private $variables = [];
 
     /**
      * @var Blueprint[]
      *
      * @Serializer\Type("array<string, Alberteddu\Octopus\DTO\Blueprint>")
      */
-    private $blueprints;
+    private $blueprints = [];
 
     /**
      * @var array[]
      *
      * @Serializer\Type("array<string, array>")
      */
-    private $data;
+    private $data = [];
 
     /**
      * @var Output[]

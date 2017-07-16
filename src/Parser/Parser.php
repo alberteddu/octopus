@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace Alberteddu\Octopus\Parser;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Twig_Environment;
 
 class Parser
 {
     public function parse($subject, $substitutions)
     {
-        $language = new ExpressionLanguage();
-        $regex = '!\$\{([^\}]+)\}!';
-
-        return preg_replace_callback($regex, function($matches) use ($substitutions, $language) {
-            return $language->evaluate($matches[1], $substitutions);
-        }, $subject);
+        $twig = new Twig_Environment(new \Twig_Loader_Array(['template' => $subject]));
+        return $twig->render('template', $substitutions);
     }
 }

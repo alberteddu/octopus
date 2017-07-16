@@ -5,6 +5,9 @@
         "target": {
             "type": "string"
         },
+        "templates": {
+            "type": "string"
+        },
         "variables": {
             "type": "object",
             "patternProperties": {
@@ -76,6 +79,9 @@
                         "type": "string"
                     },
                     "blueprint": {
+                        "type": "string"
+                    },
+                    "group": {
                         "type": "string"
                     }
                 }

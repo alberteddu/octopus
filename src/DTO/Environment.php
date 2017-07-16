@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Alberteddu\Octopus\DTO;
 
+use Alberteddu\Octopus\Parser\Parser;
+
 class Environment
 {
     /**

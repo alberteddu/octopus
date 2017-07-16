@@ -11,7 +11,7 @@ services:
 
   builder:
     class: '\Alberteddu\Octopus\Builder\Builder'
-    arguments: ['@parser', '@validator', '@render', '@input', '@output']
+    arguments: ['@parser', '@validator', '@render', '@input', '@output', '@serializer']
 
   validator:
     class: '\Alberteddu\Octopus\Validator\Validator'
@@ -22,3 +22,4 @@ services:
 
   render:
     class: '\Alberteddu\Octopus\Render\Render'
+    arguments: ['@serializer']

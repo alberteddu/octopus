@@ -11,6 +11,7 @@ use Alberteddu\Octopus\DTO\Output;
 use Alberteddu\Octopus\Parser\Parser;
 use Alberteddu\Octopus\Render\Render;
 use Alberteddu\Octopus\Validator\Validator;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,6 +56,11 @@ class Builder
     private $output;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * @var bool
      */
     private $overwrite = false;
@@ -69,7 +75,8 @@ class Builder
         Validator $validator,
         Render $render,
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
+        SerializerInterface $serializer
     )
     {
         $this->parser = $parser;
@@ -77,6 +84,7 @@ class Builder
         $this->render = $render;
         $this->input = $input;
         $this->output = $output;
+        $this->serializer = $serializer;
         $this->helperSet = new HelperSet([new QuestionHelper()]);
     }
 
@@ -104,17 +112,44 @@ class Builder
     public function buildNode(Output $output)
     {
         if ($output->cycles()) {
-            foreach ($this->configuration->getData()[$output->getBlueprint()] as $blueprint) {
-                $blueprintInstance = new BlueprintInstance($this->configuration->getBlueprint($output->getBlueprint()), $blueprint);
+            if ($output->hasGroup()) {
+                $groups = [];
 
-                if ($output->isDirectory()) {
-                    $this->buildDirectory($output, $blueprintInstance);
+                foreach ($this->configuration->getData()[$output->getBlueprint()] as $blueprint) {
+                    $value = $blueprint[$output->getGroup()];
+
+                    if (!isset($groups[$value])) {
+                        $groups[$value] = [];
+                    }
+
+                    $groups[$value][] = new BlueprintInstance($this->configuration->getBlueprint($output->getBlueprint()), $blueprint);
                 }
 
-                if ($output->isFile()) {
-                    $this->buildFile($output, $blueprintInstance);
+                foreach ($groups as $group) {
+                    if ($output->isDirectory()) {
+                        $this->buildDirectory($output, null, $group);
+                    }
+
+                    if ($output->isFile()) {
+                        $this->buildFile($output, null, $group);
+                    }
+                }
+
+            } else {
+                foreach ($this->configuration->getData()[$output->getBlueprint()] as $blueprint) {
+                    $blueprintInstance = new BlueprintInstance($this->configuration->getBlueprint($output->getBlueprint()), $blueprint);
+
+                    if ($output->isDirectory()) {
+                        $this->buildDirectory($output, $blueprintInstance);
+                    }
+
+                    if ($output->isFile()) {
+                        $this->buildFile($output, $blueprintInstance);
+                    }
                 }
             }
+
+
         } else {
             if ($output->isDirectory()) {
                 $this->buildDirectory($output);
@@ -126,9 +161,13 @@ class Builder
         }
     }
 
-    public function buildFile(Output $output, BlueprintInstance $contextBlueprint = null)
+    public function buildFile(
+        Output $output,
+        BlueprintInstance $contextBlueprint = null,
+        array $contextBlueprints = null
+    )
     {
-        $path = $this->parsePath($output->getPath(), $contextBlueprint);
+        $path = $this->parsePath($output->getPath(), $contextBlueprint, $contextBlueprints);
         $dirname = dirname($path);
         $overwrite = $this->overwrite;
         $willOverwrite = $this->overwrite;
@@ -155,7 +194,16 @@ class Builder
             mkdir($dirname, 0777, true);
         }
 
-        $template = $this->render->render($output, $this->environment, $contextBlueprint);
+        if ($output->getTemplate()) {
+            $template = $this->render->render(
+                $this->parseString($output->getTemplate(), $contextBlueprint, $contextBlueprints),
+                $this->environment,
+                $contextBlueprint,
+                $contextBlueprints
+            );
+        } else {
+            $template = '';
+        }
 
         if ($willOverwrite) {
             // Check if the file contains any dynamic section
@@ -193,9 +241,13 @@ class Builder
         }
     }
 
-    public function buildDirectory(Output $output, BlueprintInstance $contextBlueprint = null)
+    public function buildDirectory(
+        Output $output,
+        BlueprintInstance $contextBlueprint = null,
+        array $contextBlueprints = null
+    )
     {
-        $path = $this->parsePath($output->getPath(), $contextBlueprint);
+        $path = $this->parsePath($output->getPath(), $contextBlueprint, $contextBlueprints);
 
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
@@ -205,11 +257,25 @@ class Builder
         }
     }
 
-    private function parsePath(string $path, BlueprintInstance $contextBlueprint = null): string
+    private function parseString(
+        string $string,
+        BlueprintInstance $contextBlueprint = null,
+        array $contextBlueprints = null
+    ): string
     {
-        return joinPaths($this->configuration->getTarget(), $this->parser->parse($path, [
+        return $this->parser->parse($string, [
+            'blueprints' => $contextBlueprints,
             'blueprint' => $contextBlueprint,
-            'variables' => (object) $this->configuration->getVariables(),
-        ]));
+            'configuration' => $this->serializer->toArray($this->configuration),
+        ]);
+    }
+
+    private function parsePath(
+        string $path,
+        BlueprintInstance $contextBlueprint = null,
+        array $contextBlueprints = null
+    ): string
+    {
+        return joinPaths($this->configuration->getTarget(), $this->parseString($path, $contextBlueprint, $contextBlueprints));
     }
 }

@@ -78,7 +78,7 @@ class Output
     /**
      * @return string
      */
-    public function getTemplate(): string
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -135,6 +135,11 @@ class Output
 
     public function cycles(): bool
     {
-        return null !== $this->getBlueprint();
+        return null !== $this->blueprint;
+    }
+
+    public function hasGroup(): bool
+    {
+        return null !== $this->group;
     }
 }
