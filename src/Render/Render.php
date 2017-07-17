@@ -39,11 +39,24 @@ class Render
             'debug' => true
         ]);
         $twig->addExtension(new Twig_Extension_Debug());
+        $data = [];
+
+        foreach ($configuration->getData() as $blueprintName => $dataList) {
+            $blueprint = $configuration->getBlueprint($blueprintName);
+            if (!isset($data[$blueprintName])) {
+                $data[$blueprintName] = [];
+            }
+
+            foreach ($dataList as $datum) {
+                $data[$blueprintName][] = new BlueprintInstance($blueprint, $datum);
+            }
+        }
 
         return $twig->render($template, [
             'configuration' => $this->serializer->toArray($configuration),
             'blueprint' => $contextBlueprint,
             'blueprints' => $contextBlueprints,
+            'data' => $data,
         ]);
     }
 }

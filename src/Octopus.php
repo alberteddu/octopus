@@ -39,7 +39,7 @@ class Octopus
         $this->container = $container;
     }
 
-    public function getConfigurationFromFile(string $path): Configuration
+    public function getConfigurationFromFile(string $path): ?Configuration
     {
         /** @var SerializerInterface $serializer */
         $serializer = $this->container->get('serializer');
@@ -72,6 +72,11 @@ class Octopus
 
         $currentWorkingDirectory = dirname($path);
         $configuration = $this->getConfigurationFromFile($path);
+
+        if (null === $configuration) {
+            return;
+        }
+
         $environment = new Environment($configuration, $currentWorkingDirectory);
 
         $builder->build($environment);
