@@ -23,9 +23,9 @@ class BlueprintVariable
     private $required = false;
 
     /**
-     * @var string
+     * @var mixed
      *
-     * @Serializer\Type("string")
+     * @Serializer\Type("default")
      */
     private $default;
 
@@ -70,19 +70,19 @@ class BlueprintVariable
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getDefault(): string
+    public function getDefault()
     {
         return $this->default;
     }
 
     /**
-     * @param string $default
+     * @param mixed $default
      *
      * @return BlueprintVariable
      */
-    public function setDefault(string $default): BlueprintVariable
+    public function setDefault($default): BlueprintVariable
     {
         $this->default = $default;
 
@@ -100,6 +100,12 @@ class BlueprintVariable
                 break;
             case 'boolean':
                 return is_bool($value);
+                break;
+            case 'array':
+                return is_array($value);
+                break;
+            case 'object':
+                return is_array($value);
                 break;
             default:
                 return false;

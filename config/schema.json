@@ -33,13 +33,13 @@
                                         "type": {
                                             "type": "string",
                                             "required": true,
-                                            "enum": ["string", "boolean", "integer"]
+                                            "enum": ["string", "boolean", "integer", "array", "object"]
                                         },
                                         "required": {
                                             "type": "boolean"
                                         },
                                         "default": {
-                                            "type": ["string", "boolean", "integer"]
+                                            "type": ["string", "boolean", "integer", "array", "object"]
                                         }
                                     }
                                 }

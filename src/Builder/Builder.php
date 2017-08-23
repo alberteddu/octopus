@@ -205,7 +205,7 @@ class Builder
             $template = '';
         }
 
-        if ($willOverwrite) {
+        if ($willOverwrite && is_file($path) && is_readable($path)) {
             // Check if the file contains any dynamic section
             // that must be preserved.
             $currentMatches = [];
