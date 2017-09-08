@@ -6,7 +6,6 @@ namespace Alberteddu\Octopus\Command;
 
 use Alberteddu\Octopus\Octopus;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,8 +15,7 @@ class BuildCommand extends Command
     {
         $this
             ->setName('build')
-            ->setDescription('Build files and directories using octopus.json.')
-        ;
+            ->setDescription('Build files and directories using octopus.json.');
     }
 
     /**
@@ -29,15 +27,26 @@ class BuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $cwd = getcwd();
-        $file = joinPaths($cwd, 'octopus.json');
+        $files = [
+            joinPaths($cwd, 'octopus.oc'),
+            joinPaths($cwd, 'octopus.json'),
+        ];
+        $selectedFile = '';
 
-        if (!is_readable($file) || !is_file($file)) {
-            $output->writeln('<error>Could not find octopus.json</error>');
+        foreach ($files as $file) {
+            if (is_readable($file) && is_file($file)) {
+                $selectedFile = $file;
+                break;
+            }
+        }
+
+        if (!$selectedFile) {
+            $output->writeln('<error>Could not find octopus.oc or octopus.json</error>');
 
             return;
         }
 
         $octopus = new Octopus($input, $output);
-        $octopus->buildFromFile($file);
+        $octopus->buildFromFile($selectedFile);
     }
 }

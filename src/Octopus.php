@@ -7,6 +7,7 @@ namespace Alberteddu\Octopus;
 use Alberteddu\Octopus\DTO\Configuration;
 use Alberteddu\Octopus\Builder\Builder;
 use Alberteddu\Octopus\DTO\Environment;
+use Alberteddu\Octopus\Parser\OctopusParser;
 use Alberteddu\Octopus\Validator\Validator;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -39,7 +40,7 @@ class Octopus
         $this->container = $container;
     }
 
-    public function getConfigurationFromFile(string $path): ?Configuration
+    public function getConfigurationFromFile(string $path) : ?Configuration
     {
         /** @var SerializerInterface $serializer */
         $serializer = $this->container->get('serializer');
@@ -49,6 +50,11 @@ class Octopus
         $output = $this->container->get('output');
 
         $contents = file_get_contents($path);
+
+        if (substr($path, -3) === '.oc') {
+            $contents = OctopusParser::parse($contents);
+        }
+
         $valid = $validator->validateConfigurationString($contents, $errors);
 
         if (!$valid) {

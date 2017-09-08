@@ -25,6 +25,11 @@ class Validator
     {
         $configuration = json_decode($configuration);
 
+        return $this->validateConfigurationArray($configuration, $errors);
+    }
+
+    public function validateConfigurationArray($configuration, &$errors = []): bool
+    {
         $this->schemaValidator->validate(
             $configuration,
             json_decode(file_get_contents(__DIR__ . '/../../config/schema.json'))

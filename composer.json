@@ -18,6 +18,9 @@
         "symfony/config": "^3.3",
         "jms/serializer": "^1.7",
         "justinrainbow/json-schema": "^5.2",
-        "deployer/phar-update": "^2.0"
+        "deployer/phar-update": "^2.0",
+        "wouterj/peg": "dev-master",
+        "hnesk/php-peg": "^1.0",
+        "ferno/loco": "dev-master"
     }
 }
